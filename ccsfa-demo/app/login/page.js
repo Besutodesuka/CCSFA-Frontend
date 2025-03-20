@@ -1,18 +1,43 @@
 // app/login/page.js
+
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import CryptoJS from "crypto-js";  // Import crypto-js library
 
 export default function Login() {
   const router = useRouter();
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Simulate authentication
-    router.push("/wait");
+
+    // Hash the password using SHA256 before sending it to the server
+    const hashedPassword = CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex);
+
+    // Log to check the hashed password
+    console.log("Hashed password:", hashedPassword);
+
+    const response = await fetch("/api/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password: hashedPassword }), // Send the hashed password
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      console.log("Login response:", data);
+      router.push("/wait");
+    } else {
+      console.log("Login failed:", data.error);
+      setError(data.error || "An error occurred");
+    }
   };
 
   return (
@@ -20,11 +45,11 @@ export default function Login() {
       <h2>Login Page</h2>
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: "1rem" }}>
-          <label>Username: </label>
+          <label>Email: </label>
           <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
         </div>
@@ -38,6 +63,7 @@ export default function Login() {
           />
         </div>
         <button type="submit">Login</button>
+        {error && <div style={{ color: "red" }}>{error}</div>}
       </form>
     </div>
   );
