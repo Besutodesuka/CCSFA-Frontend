@@ -1,3 +1,3 @@
-[submodule "ccsfa-demo/database"]
-	path = ccsfa-demo/database
+[submodule "ccsfa-demo/Backend"]
+	path = ccsfa-demo/Backend
 	url = https://github.com/ZTPG101/CCSFA.git
