@@ -26,17 +26,16 @@ export default function Login() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ email, password: hashedPassword }), // Send the hashed password
+      body: JSON.stringify({ email, password }),
     });
 
     const data = await response.json();
+    console.log("📩 API Response:", data);
 
     if (response.ok) {
-      console.log("Login response:", data);
-      router.push("/wait");
+      router.push("/wait"); // Redirect on success
     } else {
-      console.log("Login failed:", data.error);
-      setError(data.error || "An error occurred");
+      alert(data.error || "Login failed");
     }
   };
 

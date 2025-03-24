@@ -1,14 +1,32 @@
-// Use to check data in database
 import sqlite3 from 'sqlite3';
-const db = new sqlite3.Database('./mydatabase.db');
+import path from 'path';
 
-// Query to get all users
-db.all("SELECT * FROM users", [], (err, rows) => {
+// Ensure correct database path
+const dbPath = path.join(process.cwd(), 'Backend', 'Database', 'mydatabase.db');
+
+// Open the database connection
+const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
-    throw err;
-  }
-  console.log(rows);
-});
+    console.error('Error opening database:', err.message);
+  } else {
+    console.log('Connected to database:', dbPath);
 
-// Close the database when done
-db.close();
+    // Query to get all users
+    db.all("SELECT * FROM users", [], (err, rows) => {
+      if (err) {
+        console.error('Error fetching users:', err.message);
+      } else {
+        console.log('Users:', rows);
+      }
+
+      // Close the database after the query
+      db.close((err) => {
+        if (err) {
+          console.error('Error closing database:', err.message);
+        } else {
+          console.log('Database closed.');
+        }
+      });
+    });
+  }
+});
